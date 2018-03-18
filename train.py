@@ -6,7 +6,7 @@ import random
 
 images = []
 measurements = []
-subfolders = ['data2', 'data3', 'data4', 'data5']
+subfolders = ['data2', 'data3', 'data4', 'data5', 'data6']
 
 def generator(samples, batch_size=32):
     num_samples = len(samples)
@@ -19,6 +19,7 @@ def generator(samples, batch_size=32):
             angles = []
             for batch_sample in batch_samples:
                 image = cv2.imread(batch_sample[0])
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 angle = float(batch_sample[1])
                 images.append(image)
                 images.append(np.fliplr(image))
@@ -55,7 +56,7 @@ for subfolder in subfolders:
 
         measurement = float(line[3])
 
-        lr_offset = 0.4
+        lr_offset = 0.15
         samples.append( (center_path, measurement) )
         samples.append( (left_path, measurement + lr_offset) )
         samples.append( (right_path, measurement - lr_offset) )
