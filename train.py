@@ -1,14 +1,45 @@
 import cv2
 import csv
 import numpy as np
+import sklearn
+import random
 
 images = []
 measurements = []
-subfolders = ['data2', 'data3', '']
+subfolders = ['data2', 'data3', 'data4', 'data5']
+
+def generator(samples, batch_size=32):
+    num_samples = len(samples)
+    while True:
+        samples = random.sample(samples, len(samples))
+        for offset in range(0, num_samples, batch_size):
+            batch_samples = samples[offset:offset+batch_size]
+
+            images = []
+            angles = []
+            for batch_sample in batch_samples:
+                image = cv2.imread(batch_sample[0])
+                angle = float(batch_sample[1])
+                images.append(image)
+                images.append(np.fliplr(image))
+                angles.append(angle)
+                angles.append(-angle)
+                if image is None:
+                    print(batch_sample[0])
+
+            X_train = np.array(images)
+            y_train = np.array(angles)
+            output = sklearn.utils.shuffle(X_train, y_train)
+            if output is None:
+                print(batch_samples)
+            yield output
+
+
+samples = []
 
 for subfolder in subfolders:
     lines = []
-    with open('../data/driving_log.csv') as csvfile:
+    with open('../data/' + subfolder + '/driving_log.csv') as csvfile:
         reader = csv.reader(csvfile)
         for line in reader:
             lines.append(line)
@@ -22,31 +53,23 @@ for subfolder in subfolders:
         left_path = '../data/' + subfolder + '/IMG/' + left_filename
         right_path = '../data/' + subfolder + '/IMG/' + right_filename
 
-        center_image = cv2.imread(center_path)
-        left_image = cv2.imread(left_path)
-        right_image = cv2.imread(right_path)
-
-        if center_image is None or left_image is None or right_image is None:
-               continue
-
-        images.append(center_image)
-        images.append(np.fliplr(center_image))
-        images.append(left_image)
-        images.append(np.fliplr(left_image))
-        images.append(right_image)
-        images.append(np.fliplr(right_image))
-
-        lr_offset = 0.1
         measurement = float(line[3])
-        measurements.append(measurement)
-        measurements.append(-measurement)
-        measurements.append(measurement+lr_offset)
-        measurements.append(-(measurement+lr_offset))
-        measurements.append(measurement-lr_offset)
-        measurements.append(-(measurement-lr_offset))
 
-X_train = np.array(images)
-y_train = np.array(measurements)
+        lr_offset = 0.4
+        samples.append( (center_path, measurement) )
+        samples.append( (left_path, measurement + lr_offset) )
+        samples.append( (right_path, measurement - lr_offset) )
+
+
+samples_shuffled = random.sample(samples, len(samples))
+validation_cut = 0.2
+validation_split = int((1-validation_cut)*len(samples_shuffled))
+train_samples = samples[:validation_split]
+validation_samples = samples[validation_split:]
+
+
+train_generator = generator(train_samples, batch_size=32)
+validation_generator = generator(validation_samples, batch_size=32)
 
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D, Dropout
@@ -74,6 +97,8 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=5)
+#model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=5)
+model.fit_generator(train_generator, samples_per_epoch=2*len(train_samples), validation_data=validation_generator, nb_val_samples=2*len(validation_samples), nb_epoch=3)
+
 
 model.save('../models/model.h5')
