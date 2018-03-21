@@ -6,8 +6,16 @@ import random
 
 images = []
 measurements = []
+
+# List of subfolders (simulation trainin runs) to look for data
+# All training data will be located in ../data/<subfolder>/
+
 subfolders = ['data2', 'data3', 'data4', 'data5', 'data6']
 
+'''
+Generator is used to load and preprocess in a concurrent thread in parallel
+with the training of the model
+'''
 def generator(samples, batch_size=32):
     num_samples = len(samples)
     while True:
@@ -35,9 +43,11 @@ def generator(samples, batch_size=32):
                 print(batch_samples)
             yield output
 
-
+# Sample consists of (image_path, steering_measurement)
 samples = []
 
+# Load image_paths and measurements from file. Actual loading of images is done
+# in the generator
 for subfolder in subfolders:
     lines = []
     with open('../data/' + subfolder + '/driving_log.csv') as csvfile:
@@ -62,16 +72,18 @@ for subfolder in subfolders:
         samples.append( (right_path, measurement - lr_offset) )
 
 
+# Split 20% of the samples out into validation samples
 samples_shuffled = random.sample(samples, len(samples))
 validation_cut = 0.2
 validation_split = int((1-validation_cut)*len(samples_shuffled))
 train_samples = samples[:validation_split]
 validation_samples = samples[validation_split:]
 
-
+# Create training and validation generators
 train_generator = generator(train_samples, batch_size=32)
 validation_generator = generator(validation_samples, batch_size=32)
 
+# Import layers for model
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D, Dropout
 from keras.layers.convolutional import Convolution2D
@@ -90,6 +102,8 @@ model.add(Convolution2D(36, 5, 5, subsample=(2,2), activation='relu'))
 model.add(Convolution2D(48, 5, 5, subsample=(2,2), activation='relu'))
 model.add(Convolution2D(64, 3, 3, activation='relu'))
 model.add(Convolution2D(64, 3, 3, activation='relu'))
+
+# Fully connected layers
 model.add(Flatten())
 model.add(Dense(100))
 model.add(Dropout(0.5))
@@ -100,8 +114,8 @@ model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
 
-#model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=5)
+# Train model using generator
 model.fit_generator(train_generator, samples_per_epoch=2*len(train_samples), validation_data=validation_generator, nb_val_samples=2*len(validation_samples), nb_epoch=3)
 
-
+# Save model to the ../models directory
 model.save('../models/model.h5')
