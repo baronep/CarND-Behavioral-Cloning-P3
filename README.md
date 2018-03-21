@@ -76,11 +76,11 @@ Training data was generated on both tracks, traveling in both directions. I augm
 
 I began using the Nvidia model proposed in the lecture which is laid out as follows
 
-- Convolution (5x5 Kernel)
-- Convolution (5x5 Kernel)
-- Convolution (5x5 Kernel)
-- Convolution (3x3 Kernel)
-- Convolution (3x3 Kernel)
+- Convolution (5x5 Kernel + RELU)
+- Convolution (5x5 Kernel + RELU)
+- Convolution (5x5 Kernel + RELU)
+- Convolution (3x3 Kernel + RELU)
+- Convolution (3x3 Kernel + RELU)
 - Dense FC (100)
 - Dense FC (50)
 - Dense FC (10)
@@ -103,11 +103,11 @@ Finally, I augmented the incoming training data as follows
 - Input Layer (160px x 320px)
 - Normalization (160px x 320px)
 - Cropping
-- Convolution (5x5 Kernel)
-- Convolution (5x5 Kernel)
-- Convolution (5x5 Kernel)
-- Convolution (3x3 Kernel)
-- Convolution (3x3 Kernel)
+- Convolution (5x5 Kernel + RELU)
+- Convolution (5x5 Kernel + RELU)
+- Convolution (5x5 Kernel + RELU)
+- Convolution (3x3 Kernel + RELU)
+- Convolution (3x3 Kernel + RELU)
 - Dense FC (100)
 - Dropout (0.5)
 - Dense FC (50)
