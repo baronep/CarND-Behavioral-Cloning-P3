@@ -10,11 +10,11 @@ The goals / steps of this project are the following:
 * Test that the model successfully drives around track one without leaving the road
 * Summarize the results with a written report
 
-[image_orig]: ./images/image_orig.png
-[cropped]: ./images/cropped.png
-[flipped]: ./images/flipped.png
-[left_offset]: ./images/left_offset.png
-[right_offset]: ./images/right_offset.png
+[image_orig]: ./images/image_orig.jpg
+[cropped]: ./images/cropped.jpg
+[flipped]: ./images/flipped.jpg
+[left_offset]: ./images/left_offset.jpg
+[right_offset]: ./images/right_offset.jpg
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
