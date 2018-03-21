@@ -60,7 +60,7 @@ adding dropout layers after the first 2 fully connected layers
 
 #### 2. Attempts to reduce overfitting in the model
 
-I added 2 dropout layers after the first 2 fully connected layers in an attempt to prevent overfitting. Additionally, using only 3 training epochs helped to prevent overfitting to the data
+I added 2 dropout layers after the first 2 fully connected layers in an attempt to prevent overfitting. Additionally, using only 3 training epochs helped to prevent overfitting to the data. Finally, 20% of the data was not used in training but was used only for validating the model.
 
 #### 3. Model parameter tuning
 
