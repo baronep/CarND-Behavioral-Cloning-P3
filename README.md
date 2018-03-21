@@ -128,7 +128,9 @@ From here, I normalized images and cropped the image to include only the area of
 Finally, the images were flipped L/R and the left offset and right offset camera images were used as well.
 
 ![alt text][flipped]
+
 ![alt_text][left_offset]
+
 ![alt_text][right_offset]
 
 When training the final model, I had access to 39091 raw images which equates finally to 78182 augmented images.
